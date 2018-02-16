@@ -24,7 +24,7 @@ topology_template:
     template:
         type: string
         description: VCloud template name
-        default: a
+        default: 
     ram:
         type: integer
         description: Amount of RAM [GB]
