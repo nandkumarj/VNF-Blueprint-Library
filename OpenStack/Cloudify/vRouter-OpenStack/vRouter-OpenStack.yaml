@@ -1,0 +1,71 @@
+tosca_definitions_version: cloudify_dsl_1_3
+# 
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.4.1/types.yaml
+  - http://getcloudify.org.s3.amazonaws.com/spec/openstack-plugin/2.0/plugin.yaml
+
+inputs:
+
+  name:
+    default: 
+  image_id: 
+    default: aa
+  flavor_id:
+    default: 05a9e6d1-d29f-4e98-9eab-51c9a6beed44
+  network1_name:
+    default: 
+  network2_name:
+    default: 
+  network3_name:
+    default: 
+ 
+  openstack_config:
+    default: {}
+
+node_templates:
+  
+  _host:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      image: { get_input: image_id }
+      flavor: { get_input: flavor_id }
+      server:
+        name: { get_input: name }
+      agent_config:
+        install_method: none
+      openstack_config: { get_input: openstack_config }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: network1
+      - type: cloudify.relationships.connected_to
+        target: network2 
+      - type: cloudify.relationships.connected_to
+        target: network3 
+
+
+
+        
+  network1:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: network1_name }
+      openstack_config: { get_input: openstack_config }
+
+  network2:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: network2_name }
+      openstack_config: { get_input: openstack_config }
+
+  network3:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: network3_name }
+      openstack_config: { get_input: openstack_config }
+
+
+    
