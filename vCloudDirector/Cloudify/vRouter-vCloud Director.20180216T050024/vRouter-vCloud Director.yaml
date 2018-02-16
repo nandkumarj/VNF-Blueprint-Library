@@ -1,0 +1,108 @@
+tosca_definitions_version: cloudify_dsl_1_3
+# 
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.4.1/types.yaml
+  - https://raw.githubusercontent.com/cloudify-cosmo/tosca-vcloud-plugin/1.4/plugin.yaml
+
+inputs:
+  name:
+    default: 
+  template:
+    default: aa
+  ram:
+    default: 1024
+  cpu:
+    default: 1
+  catalog:
+    default: aa
+  network1_name:
+    default: 
+  network2_name:
+    default: 
+  network3_name:
+    default: 
+  vcloud_config:
+    default: {}
+ 
+
+node_templates:
+
+  _host:
+    type: cloudify.vcloud.nodes.Server
+    properties:
+      server:
+        name: { get_input: name }
+        catalog: { get_input: catalog }
+        template: { get_input: template }
+        hardware:
+          memory: { get_input: ram }
+          cpu: { get_input: cpu }
+      agent_config:
+        install_method: none
+      vcloud_config: { get_input: vcloud_config }
+    relationships:
+      - type: cloudify.vcloud.server_connected_to_port
+        target: network1_port
+      - type: cloudify.vcloud.server_connected_to_port
+        target: network2_port
+      - type: cloudify.vcloud.server_connected_to_port
+        target: network3_port 
+
+
+
+
+  network1_port:
+    type: cloudify.vcloud.nodes.Port
+    properties:
+      port:
+        network: { get_input: network1_name }
+        ip_allocation_mode: dhcp
+        primary_interface: true
+      vcloud_config: { get_input: vcloud_config }
+    relationships:
+      - target: network1
+        type: cloudify.vcloud.port_connected_to_network
+
+  network1:
+    type: cloudify.vcloud.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: network1_name }
+      vcloud_config: { get_input: vcloud_config }
+
+  network2_port:
+    type: cloudify.vcloud.nodes.Port
+    properties:
+      port:
+        network: { get_input: network2_name }
+      vcloud_config: { get_input: vcloud_config }
+    relationships:
+      - target: network2
+        type: cloudify.vcloud.port_connected_to_network
+
+  network2:
+    type: cloudify.vcloud.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: network2_name }
+      vcloud_config: { get_input: vcloud_config }
+
+  network3_port:
+    type: cloudify.vcloud.nodes.Port
+    properties:
+      port:
+        network: { get_input: network3_name }
+      vcloud_config: { get_input: vcloud_config }
+    relationships:
+      - target: network3
+        type: cloudify.vcloud.port_connected_to_network
+
+  network3:
+    type: cloudify.vcloud.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: network3_name }
+      vcloud_config: { get_input: vcloud_config }
+
+
