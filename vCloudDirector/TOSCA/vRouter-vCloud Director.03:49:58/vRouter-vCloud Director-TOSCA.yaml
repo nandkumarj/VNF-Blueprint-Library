@@ -47,7 +47,7 @@ topology_template:
                         cpu_allocation:
                             cpu_affinity: ANY
             properties:
-                image: ubuntu
+                image: 1
         CP1:
             properties:
                 name: 
